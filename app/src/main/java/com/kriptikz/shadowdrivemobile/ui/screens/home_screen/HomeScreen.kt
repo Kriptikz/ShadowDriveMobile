@@ -30,52 +30,11 @@ import com.kriptikz.shadowdrivemobile.ui.screens.SDMScaffold
 import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
 
 @Composable
-fun HomeScreen() {
-    val usedStorage = 14.5
-    val totalStorage = 40.0
-    val drives = listOf("Photos", "Videos", "Pictures", "Temporary", "AnotherOne", "Ok")
-    val recentItems = listOf(
-        RecentItem(
-            name = "file.txt",
-            day = "today",
-            size = "10.0MB",
-        ),
-        RecentItem(
-            name = "file.txt",
-            day = "today",
-            size = "10.0MB",
-        ),
-        RecentItem(
-            name = "file.txt",
-            day = "today",
-            size = "10.0MB",
-        ),
-        RecentItem(
-            name = "file.txt",
-            day = "today",
-            size = "10.0MB",
-        ),
-        RecentItem(
-            name = "file.txt",
-            day = "today",
-            size = "10.0MB",
-        ),
-        RecentItem(
-            name = "omarsName.txt",
-            day = "today",
-            size = "10.0GB",
-        ),
-        RecentItem(
-            name = "picture.png",
-            day = "yesterday",
-            size = "420.0MB",
-        ),
-        RecentItem(
-            name = "picture.jpg",
-            day = "yesterday",
-            size = "420.0GB",
-        ),
-    )
+fun HomeScreen(homeUiState: HomeUiState, modifier: Modifier = Modifier) {
+    val usedStorage = homeUiState.usedStorage
+    val totalStorage = homeUiState.totalStorage
+    val drives = homeUiState.drives
+    val recentItems = homeUiState.recentItems
 
     SDMScaffold(title = "Home") {
         val scrollableState = ScrollState(0)
@@ -140,7 +99,53 @@ fun HomeScreen() {
 @Composable
 fun HomeScreenPreview() {
     ShadowDriveMobileTheme {
-        HomeScreen()
+        HomeScreen(HomeUiState(
+            usedStorage = 14.5,
+            totalStorage = 40.0,
+            drives = listOf("Photos", "Videos", "Pictures", "Temporary", "AnotherOne", "Ok"),
+            recentItems = listOf(
+                RecentItem(
+                    name = "file.txt",
+                    day = "today",
+                    size = "10.0MB",
+                ),
+                RecentItem(
+                    name = "file.txt",
+                    day = "today",
+                    size = "10.0MB",
+                ),
+                RecentItem(
+                    name = "file.txt",
+                    day = "today",
+                    size = "10.0MB",
+                ),
+                RecentItem(
+                    name = "file.txt",
+                    day = "today",
+                    size = "10.0MB",
+                ),
+                RecentItem(
+                    name = "file.txt",
+                    day = "today",
+                    size = "10.0MB",
+                ),
+                RecentItem(
+                    name = "omarsName.txt",
+                    day = "today",
+                    size = "10.0GB",
+                ),
+                RecentItem(
+                    name = "picture.png",
+                    day = "yesterday",
+                    size = "420.0MB",
+                ),
+                RecentItem(
+                    name = "picture.jpg",
+                    day = "yesterday",
+                    size = "420.0GB",
+                ),
+            )
+        ))
     }
 }
 
