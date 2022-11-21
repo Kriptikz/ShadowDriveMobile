@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kriptikz.shadowdrivemobile.R
+import com.kriptikz.shadowdrivemobile.ui.screens.SDMScaffold
 import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
 
 @Composable
@@ -76,58 +77,60 @@ fun HomeScreen() {
         ),
     )
 
-    val scrollableState = ScrollState(0)
-    Column(
-        modifier = Modifier
-            .scrollable(
-                scrollableState,
-                Orientation.Horizontal,
-                enabled = true,
-            )
-    ) {
-        Box(
-            modifier = Modifier.background(Color.White)
+    SDMScaffold(title = "Home") {
+        val scrollableState = ScrollState(0)
+        Column(
+            modifier = Modifier
+                .scrollable(
+                    scrollableState,
+                    Orientation.Horizontal,
+                    enabled = true,
+                )
         ) {
             Box(
-                modifier = Modifier
-                    .clip(RectangleShape)
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.24f)
-                    .background(Color.Black)
-            )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.background(Color.White)
             ) {
-                AvailableStrorage(usedStorage, totalStorage)
-                Text(
-                    text = "Drives",
-                    style = TextStyle(
-                        color = Color.LightGray,
-                        fontSize = 16.sp
-                    ),
-                    textAlign = TextAlign.Start,
+                Box(
+                    modifier = Modifier
+                        .clip(RectangleShape)
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.24f)
+                        .background(Color.Black)
+                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                )
-                HorizontalScrollingDrives(drives = drives)
-                Spacer(modifier = Modifier.height(30.dp))
-                Text(
-                    text = "Recent Files",
-                    style = TextStyle(
-                        color = Color.LightGray,
-                        fontSize = 16.sp
-                    ),
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                )
-                VerticalScrollingRecentFileItems(recentItems = recentItems)
-            }
+                ) {
+                    AvailableStorage(usedStorage, totalStorage)
+                    Text(
+                        text = "Drives",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = 16.sp
+                        ),
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    )
+                    HorizontalScrollingDrives(drives = drives)
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Text(
+                        text = "Recent Files",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = 16.sp
+                        ),
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    )
+                    VerticalScrollingRecentFileItems(recentItems = recentItems)
+                }
 
+            }
         }
     }
 
@@ -197,7 +200,7 @@ fun HorizontalScrollingDrivesPreview() {
 }
 
 @Composable
-fun AvailableStrorage(usedStorage: Double, totalStorage: Double, modifier: Modifier = Modifier) {
+fun AvailableStorage(usedStorage: Double, totalStorage: Double, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -252,14 +255,16 @@ fun AvailableStrorage(usedStorage: Double, totalStorage: Double, modifier: Modif
 @Preview(widthDp = 500)
 @Composable
 fun AvailableStoragePreview() {
-    AvailableStrorage(14.5, 40.0, modifier = Modifier.background(Color.White))
+    AvailableStorage(14.5, 40.0, modifier = Modifier.background(Color.White))
 }
 
 @Composable
 fun RecentFileItem(recentItem: RecentItem, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth().padding(8.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
     ) {
         Box(
             modifier = Modifier
@@ -317,7 +322,9 @@ fun VerticalScrollingRecentFileItems(recentItems: List<RecentItem>, modifier: Mo
                 RecentFileItem(recentItem)
             }
         },
-        modifier = Modifier.fillMaxWidth().background(Color.White)
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
     )
 }
 
