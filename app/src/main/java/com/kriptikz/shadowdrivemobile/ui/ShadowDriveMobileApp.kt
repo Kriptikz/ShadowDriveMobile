@@ -9,8 +9,7 @@ import com.kriptikz.shadowdrivemobile.ui.screens.home_screen.HomeScreen
 import com.kriptikz.shadowdrivemobile.ui.screens.home_screen.HomeScreenViewModel
 
 @Composable
-fun ShadowDriveMobileApp(modifier: Modifier = Modifier) {
-    val driveScreenViewModel: DriveScreenViewModel = viewModel()
+fun ShadowDriveMobileApp(driveScreenViewModel: DriveScreenViewModel, modifier: Modifier = Modifier) {
     DriveScreen(
         driveUiState = driveScreenViewModel.driveUiState
     )
