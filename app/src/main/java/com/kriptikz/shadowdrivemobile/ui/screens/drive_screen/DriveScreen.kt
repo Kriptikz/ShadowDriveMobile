@@ -68,7 +68,7 @@ fun ResultScreen(fileNames: List<String>, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxSize()
     ) {
-      Text(text = fileNames.toString())
+      Text(text = "Found ${fileNames.size} files")
     }
 
 }
