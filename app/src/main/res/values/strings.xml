@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Shadow Drive Mobile</string>
+    <string name="app_name" translatable="false">Shadow Drive Mobile</string>
+    <string name="loading" translatable="false">Loading</string>
+    <string name="loading_failed" translatable="false">Failed to load</string>
 </resources>
