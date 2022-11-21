@@ -57,6 +57,9 @@ dependencies {
     // Retrofit with Kotlin serialization Converter
     implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
 
+    // OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
