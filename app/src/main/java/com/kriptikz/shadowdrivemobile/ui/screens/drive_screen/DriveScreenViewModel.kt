@@ -21,12 +21,12 @@ sealed interface DriveUiState {
 }
 
 class DriveScreenViewModel(
-    savedStateHandle: SavedStateHandle,
     private val shadowDriveRepository: ShadowDriveRepository
 ) : ViewModel() {
     var driveUiState: DriveUiState by mutableStateOf(DriveUiState.Loading)
         private set
-    private val drivePublicKey: String = checkNotNull(savedStateHandle["drivePublicKey"])
+
+    var drivePk by mutableStateOf("t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX")
 
     init {
         getDriveFiles()
@@ -35,10 +35,11 @@ class DriveScreenViewModel(
     fun getDriveFiles() {
         viewModelScope.launch {
             driveUiState = try {
-                val publicKey = drivePublicKey
-                val results = shadowDriveRepository.getDriveFileNames(publicKey).keys.filter { fileName ->
-                    fileName.endsWith(".jpg")
-                }
+                val publicKey = drivePk
+//                val results = shadowDriveRepository.getDriveFileNames(publicKey).keys.filter { fileName ->
+//                    fileName.endsWith(".jpg")
+//                }
+                val results = shadowDriveRepository.getDriveFileNames(publicKey).keys
 
                 val baseUrl = "https://shdw-drive.genesysgo.net/"
                 val urls = results.map { fileName -> "$baseUrl$publicKey/$fileName" }
@@ -55,7 +56,7 @@ class DriveScreenViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as ShadowDriveMobileApplication)
                 val shadowDriveRepository = application.container.shadowDriveRepository
-                DriveScreenViewModel(savedStateHandle = SavedStateHandle(mapOf("drivePublicKey" to "t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX")), shadowDriveRepository = shadowDriveRepository)
+                DriveScreenViewModel(shadowDriveRepository = shadowDriveRepository)
             }
         }
     }
