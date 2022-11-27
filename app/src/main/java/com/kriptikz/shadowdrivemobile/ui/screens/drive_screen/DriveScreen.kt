@@ -25,6 +25,7 @@ import com.kriptikz.shadowdrivemobile.R
 @Composable
 fun DriveScreen(
     driveUiState: DriveUiState,
+    drivePublicKey: String? = "",
     modifier: Modifier = Modifier
 ) {
     SDMScaffold(title = "Drive") {

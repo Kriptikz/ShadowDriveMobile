@@ -4,11 +4,9 @@ import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.getInstance
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kriptikz.shadowdrivemobile.ShadowDriveMobileApplication
@@ -23,21 +21,21 @@ sealed interface DriveUiState {
 }
 
 class DriveScreenViewModel(
+    savedStateHandle: SavedStateHandle,
     private val shadowDriveRepository: ShadowDriveRepository
 ) : ViewModel() {
     var driveUiState: DriveUiState by mutableStateOf(DriveUiState.Loading)
         private set
-
+    private val drivePublicKey: String = checkNotNull(savedStateHandle["drivePublicKey"])
 
     init {
         getDriveFiles()
     }
 
     fun getDriveFiles() {
-//        driveUiState = "Set the api response here!"
         viewModelScope.launch {
             driveUiState = try {
-                val publicKey = "t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX"
+                val publicKey = drivePublicKey
                 val results = shadowDriveRepository.getDriveFileNames(publicKey).keys.filter { fileName ->
                     fileName.endsWith(".jpg")
                 }
@@ -57,7 +55,7 @@ class DriveScreenViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as ShadowDriveMobileApplication)
                 val shadowDriveRepository = application.container.shadowDriveRepository
-                DriveScreenViewModel(shadowDriveRepository = shadowDriveRepository)
+                DriveScreenViewModel(savedStateHandle = SavedStateHandle(mapOf("drivePublicKey" to "t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX")), shadowDriveRepository = shadowDriveRepository)
             }
         }
     }
