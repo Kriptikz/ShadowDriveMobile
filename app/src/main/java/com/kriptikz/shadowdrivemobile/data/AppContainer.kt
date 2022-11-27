@@ -19,7 +19,7 @@ interface AppContainer {
 class DefaultAppContainer: AppContainer {
 
     override val solanaRepository: ISolanaRepository by lazy {
-        SolanaRepository(networkUrl = "fakeUrl")
+        SolanaRepository()
     }
 
     private val BASE_URL =
