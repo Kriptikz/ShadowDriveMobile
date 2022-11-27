@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
@@ -32,13 +33,21 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.kriptikz.shadowdrivemobile.R
 import com.kriptikz.shadowdrivemobile.ui.screens.SDMScaffold
 import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
 
 
 @Composable
-fun HomeScreen(homeUiState: HomeUiState, modifier: Modifier = Modifier) {
+fun HomeScreen(
+    homeUiState: HomeUiState,
+    navController: NavController,
+    onNavigateToDrive: (drivePublicKey: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val usedStorage = homeUiState.usedStorage
     val totalStorage = homeUiState.totalStorage
     val drives = homeUiState.drives
@@ -81,7 +90,10 @@ fun HomeScreen(homeUiState: HomeUiState, modifier: Modifier = Modifier) {
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
-                    HorizontalScrollingDrives(drives = drives)
+                    HorizontalScrollingDrives(
+                        drives = drives,
+                        onClick = onNavigateToDrive
+                    )
                     Spacer(modifier = Modifier.height(30.dp))
                     Text(
                         text = "Recent Files",
@@ -153,17 +165,24 @@ fun HomeScreenPreview() {
                     size = "420.0GB",
                 ),
             )
-        ))
+        ),
+        navController = rememberNavController(),
+        onNavigateToDrive = {}
+        )
     }
 }
 
 @Composable
-fun DriveClickable(text: String, modifier: Modifier = Modifier) {
+fun DriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .background(Color.White)
             .padding(8.dp)
+            .clickable {
+                println("CLICKED: ${text}")
+                onClick(text)
+            }
     ) {
         Icon(painter = painterResource(
             id = R.drawable.ic_folder_drives),
@@ -183,21 +202,18 @@ fun DriveClickable(text: String, modifier: Modifier = Modifier) {
 fun MyDrivesPreview() {
     DriveClickable(
         "Photos",
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White))
+    ) {}
 }
 
 @Composable
-fun HorizontalScrollingDrives(drives: List<String>, modifier: Modifier = Modifier) {
+fun HorizontalScrollingDrives(drives: List<String>, onClick: (drivePublicKey: String) -> Unit, modifier: Modifier = Modifier) {
     LazyRow(
         content = {
             items(drives) { drive ->
                 DriveClickable(
                     text = drive,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.White))
+                    onClick = onClick
+                )
 
             }
         },
@@ -209,7 +225,7 @@ fun HorizontalScrollingDrives(drives: List<String>, modifier: Modifier = Modifie
 @Composable
 fun HorizontalScrollingDrivesPreview() {
     val drives = listOf("Photos", "Videos", "Pictures", "Temporary", "AnotherOne", "Ok")
-    HorizontalScrollingDrives(drives)
+    HorizontalScrollingDrives(drives, onClick = {})
 }
 
 @Composable
