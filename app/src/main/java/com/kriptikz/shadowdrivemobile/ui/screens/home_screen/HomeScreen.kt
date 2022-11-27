@@ -1,5 +1,8 @@
 package com.kriptikz.shadowdrivemobile.ui.screens.home_screen
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -12,22 +15,27 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kriptikz.shadowdrivemobile.R
 import com.kriptikz.shadowdrivemobile.ui.screens.SDMScaffold
 import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
+
 
 @Composable
 fun HomeScreen(homeUiState: HomeUiState, modifier: Modifier = Modifier) {
@@ -236,23 +244,7 @@ fun AvailableStorage(usedStorage: Double, totalStorage: Double, modifier: Modifi
         Box(
             contentAlignment = Alignment.Center,
         ){
-            Box(
-                modifier = Modifier
-                    .size(65.dp)
-                    .clip(CircleShape)
-                    .background(Color.Blue)
-            )
-            Box(
-                modifier = Modifier
-                    .size(55.dp)
-                    .clip(CircleShape)
-                    .background(Color.Gray)
-            )
-            Text(
-                text = "100%",
-                fontWeight = FontWeight.Bold,
-                style = TextStyle(color = Color.White),
-            )
+            CircularProgressBar(percentage = (usedStorage / totalStorage).toFloat(), number = 100, startPercentage = 0.0f)
         }
     }
 }
@@ -261,6 +253,68 @@ fun AvailableStorage(usedStorage: Double, totalStorage: Double, modifier: Modifi
 @Composable
 fun AvailableStoragePreview() {
     AvailableStorage(14.5, 40.0, modifier = Modifier.background(Color.White))
+}
+
+@Composable
+fun CircularProgressBar(
+    startPercentage: Float,
+    percentage: Float,
+    number: Int,
+    fontSize: TextUnit = 18.sp,
+    radius: Dp = 50.dp,
+    color: Color = Color.Blue,
+    strokeWidth: Dp = 6.dp,
+    animDuration: Int = 1000,
+    animDelay: Int = 0
+    ) {
+    var animationPlayed by remember {
+        mutableStateOf(false)
+    }
+
+    val curPercentage = animateFloatAsState(
+        targetValue = if(animationPlayed) percentage else startPercentage,
+        animationSpec = tween(
+            durationMillis = animDuration,
+            delayMillis = animDelay
+        )
+    )
+
+    LaunchedEffect(key1 = true) {
+        animationPlayed = true
+    }
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(radius * 2f)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(radius * 2f)
+                .clip(CircleShape)
+                .background(Color.Gray)
+        )
+        Canvas(modifier = Modifier.size(radius * 2f)) {
+            drawArc(
+                color = color,
+                startAngle = -90f,
+                sweepAngle = 360 * curPercentage.value,
+                useCenter = false,
+                style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+            )
+        }
+        Text(
+            text = (curPercentage.value * number).toInt().toString() + '%',
+            color = Color.White,
+            fontSize = fontSize,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Preview(widthDp = 500)
+@Composable
+fun AvailableStorageProgressCirclePreview() {
+    CircularProgressBar(percentage = 0.8f, number = 100, startPercentage = 0.8f)
 }
 
 @Composable
