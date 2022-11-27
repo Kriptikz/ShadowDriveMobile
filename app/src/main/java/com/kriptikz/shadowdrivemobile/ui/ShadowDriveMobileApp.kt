@@ -29,10 +29,9 @@ fun ShadowDriveMobileApp(
         composable("homeScreen") {
             HomeScreen(
                 homeUiState = homeScreenViewModel.homeUiState,
-                navController = navController,
                 onNavigateToDrive = { drivePublicKey: String ->
                     println("DRIVE PUBLIC KEY: ${drivePublicKey}")
-                    navController.navigate("driveScreen/9dyf8t2ia2QwerZsaM7DeZPovgA32Joyzw2kdYmRcoto")
+                    navController.navigate("driveScreen/${drivePublicKey}")
                 }
             )
         }
@@ -40,9 +39,11 @@ fun ShadowDriveMobileApp(
             route = "driveScreen/{drivePublicKey}",
             arguments = listOf(navArgument("drivePublicKey") { defaultValue = "t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX" })
         ) {
+            val pk = it.arguments?.getString("drivePublicKey")
+            driveScreenViewModel.drivePk = pk!!
+            driveScreenViewModel.getDriveFiles()
             DriveScreen(
                 driveUiState = driveScreenViewModel.driveUiState,
-                it.arguments?.getString("drivePublicKey")
             )
         }
     }
