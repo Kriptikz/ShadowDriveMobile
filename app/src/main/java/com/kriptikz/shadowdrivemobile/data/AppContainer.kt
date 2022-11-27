@@ -1,7 +1,9 @@
 package com.kriptikz.shadowdrivemobile.data
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.kriptikz.shadowdrivemobile.data.repositories.ISolanaRepository
 import com.kriptikz.shadowdrivemobile.data.repositories.ShadowDriveRepository
+import com.kriptikz.shadowdrivemobile.data.repositories.SolanaRepository
 import com.kriptikz.shadowdrivemobile.data.services.ShadowDriveApiService
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -10,10 +12,16 @@ import retrofit2.Retrofit
 
 interface AppContainer {
     val shadowDriveRepository: ShadowDriveRepository
+    val solanaRepository: ISolanaRepository
 }
 
 @OptIn(ExperimentalSerializationApi::class)
 class DefaultAppContainer: AppContainer {
+
+    override val solanaRepository: ISolanaRepository by lazy {
+        SolanaRepository(networkUrl = "fakeUrl")
+    }
+
     private val BASE_URL =
         "https://shadow-storage.genesysgo.net"
 
