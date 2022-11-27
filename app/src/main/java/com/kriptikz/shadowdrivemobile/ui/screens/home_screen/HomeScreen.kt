@@ -44,7 +44,6 @@ import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
 @Composable
 fun HomeScreen(
     homeUiState: HomeUiState,
-    navController: NavController,
     onNavigateToDrive: (drivePublicKey: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -166,7 +165,6 @@ fun HomeScreenPreview() {
                 ),
             )
         ),
-        navController = rememberNavController(),
         onNavigateToDrive = {}
         )
     }
@@ -184,13 +182,25 @@ fun DriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
                 onClick(text)
             }
     ) {
+        val formattedDrives =
+                text.substring(
+                    range = IntRange(
+                        start = 0,
+                        endInclusive = 5
+                    )
+                ) + "..." + text.substring(
+                    range = IntRange(
+                        start = text.length - 4,
+                        endInclusive = text.length - 1
+                    )
+                )
         Icon(painter = painterResource(
             id = R.drawable.ic_folder_drives),
             contentDescription = null,
             tint = Color.LightGray,
         )
         Text(
-            text = text,
+            text = formattedDrives,
             modifier = Modifier.padding(top = 8.dp)
         )
     }
