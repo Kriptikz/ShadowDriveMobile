@@ -38,8 +38,14 @@ class DriveScreenViewModel(
         viewModelScope.launch {
             driveUiState = try {
                 val publicKey = "t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX"
-                val result = shadowDriveRepository.getDriveFileNames(publicKey)
-                DriveUiState.Success(result.keys)
+                val results = shadowDriveRepository.getDriveFileNames(publicKey).keys.filter { fileName ->
+                    fileName.endsWith(".jpg")
+                }
+
+                val baseUrl = "https://shdw-drive.genesysgo.net/"
+                val urls = results.map { fileName -> "$baseUrl$publicKey/$fileName" }
+
+                DriveUiState.Success(urls)
             } catch (e: IOException) {
                 DriveUiState.Error
             }
