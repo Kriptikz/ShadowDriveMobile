@@ -25,7 +25,6 @@ import com.kriptikz.shadowdrivemobile.R
 @Composable
 fun DriveScreen(
     driveUiState: DriveUiState,
-    drivePublicKey: String? = "",
     modifier: Modifier = Modifier
 ) {
     SDMScaffold(title = "Drive") {
@@ -111,15 +110,13 @@ fun PhotosGridScreen(photoUrls: List<String>, modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(4.dp)
     ) {
         items(photoUrls.size) { index ->
-            if (photoUrls[index].endsWith(".jpg")) {
-                Column {
-                    Text(
-                        fontSize = 12.sp,
-                        text = photoUrls[index].split("/")[4],
-                        modifier = Modifier.height(16.dp).padding(start = 10.dp)
-                    )
-                    DrivePhotoCard(photoUrls[index])
-                }
+            Column {
+                Text(
+                    fontSize = 12.sp,
+                    text = photoUrls[index].split("/")[4],
+                    modifier = Modifier.height(16.dp).padding(start = 10.dp)
+                )
+                DrivePhotoCard(photoUrls[index])
             }
         }
     }
