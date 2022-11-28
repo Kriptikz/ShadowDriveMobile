@@ -14,7 +14,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonColors
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -34,9 +36,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.kriptikz.shadowdrivemobile.R
 import com.kriptikz.shadowdrivemobile.ui.screens.SDMScaffold
 import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
@@ -65,7 +64,7 @@ fun HomeScreen(
                 )
         ) {
             Box(
-                modifier = Modifier.background(Color.White)
+                modifier = Modifier.fillMaxHeight().background(Color.White)
             ) {
                 Box(
                     modifier = Modifier
@@ -91,27 +90,25 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
-                    HorizontalScrollingDrives(
-                        drives = drives,
-                        onClick = onNavigateToDrive
-                    )
-                    Spacer(modifier = Modifier.height(30.dp))
-                    Text(
-                        text = "Recent Files",
-                        style = TextStyle(
-                            color = Color.LightGray,
-                            fontSize = 16.sp
-                        ),
-                        textAlign = TextAlign.Start,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    )
-                    VerticalScrollingRecentFileItems(recentItems = recentItems)
-                    Spacer(modifier = Modifier.height(30.dp))
-                    Button(onClick = onAuthorize) {
-                        Text(text = "Authorize")
+                    if (homeUiState.authorized) {
+                        VerticalScrollingDrives(
+                            drives = drives,
+                            onClick = onNavigateToDrive,
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(30.dp))
+                        Button(
+                            onClick = onAuthorize,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+
+                        ) {
+                            Text(text = "Connect")
+                        }
                     }
+//                    HorizontalScrollingDrives(
+//                        drives = drives,
+//                        onClick = onNavigateToDrive
+//                    )
                 }
 
             }
@@ -169,7 +166,9 @@ fun HomeScreenPreview() {
                     day = "yesterday",
                     size = "420.0GB",
                 ),
-            )
+            ),
+            publicKey = "",
+            authorized = false,
         ),
         onNavigateToDrive = {},
         onAuthorize = {}
@@ -178,7 +177,7 @@ fun HomeScreenPreview() {
 }
 
 @Composable
-fun DriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
+fun HorizontalDriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -212,11 +211,36 @@ fun DriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
     }
 }
 
+@Composable
+fun VerticalDriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(Color.White)
+            .padding(8.dp)
+            .padding(start = 8.dp)
+            .clickable {
+                onClick(text)
+            }
+    ) {
+        Icon(painter = painterResource(
+            id = R.drawable.ic_folder_drives),
+            contentDescription = null,
+            tint = Color.LightGray,
+        )
+        Text(
+            text = text,
+            modifier = Modifier
+                .padding(8.dp)
+                .padding(start = 8.dp)
+        )
+    }
+}
 
 @Preview
 @Composable
 fun MyDrivesPreview() {
-    DriveClickable(
+    HorizontalDriveClickable(
         "Photos",
     ) {}
 }
@@ -226,7 +250,7 @@ fun HorizontalScrollingDrives(drives: List<String>, onClick: (drivePublicKey: St
     LazyRow(
         content = {
             items(drives) { drive ->
-                DriveClickable(
+                HorizontalDriveClickable(
                     text = drive,
                     onClick = onClick
                 )
@@ -242,6 +266,23 @@ fun HorizontalScrollingDrives(drives: List<String>, onClick: (drivePublicKey: St
 fun HorizontalScrollingDrivesPreview() {
     val drives = listOf("Photos", "Videos", "Pictures", "Temporary", "AnotherOne", "Ok")
     HorizontalScrollingDrives(drives, onClick = {})
+}
+
+@Composable
+fun VerticalScrollingDrives(drives: List<String>, onClick: (drivePublicKey: String) -> Unit, modifier: Modifier = Modifier) {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = 50.dp),
+        content = {
+            items(drives) { drive ->
+                VerticalDriveClickable(
+                    text = drive,
+                    onClick = onClick
+                )
+
+            }
+        },
+        modifier = modifier.fillMaxHeight()
+    )
 }
 
 @Composable
@@ -276,7 +317,7 @@ fun AvailableStorage(usedStorage: Double, totalStorage: Double, modifier: Modifi
         Box(
             contentAlignment = Alignment.Center,
         ){
-            CircularProgressBar(percentage = (usedStorage / totalStorage).toFloat(), number = 100, startPercentage = 0.0f)
+            CircularProgressBar(percentage = (if (totalStorage == 0.0) 0.0 else  usedStorage / totalStorage).toFloat(), number = 100, startPercentage = 0.0f)
         }
     }
 }

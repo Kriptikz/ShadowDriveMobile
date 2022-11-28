@@ -35,7 +35,8 @@ data class HomeUiState(
     val totalStorage: Double,
     val drives: List<String>,
     val recentItems: List<RecentItem>,
-    var publicKey: String,
+    val publicKey: String,
+    val authorized: Boolean
 )
 
 class HomeScreenViewModel(
@@ -47,11 +48,11 @@ class HomeScreenViewModel(
             drives = listOf(),
             recentItems = listOf(),
             publicKey = "",
+            authorized = false
         ))
         private set
 
     private val mobileWalletAdapterClientSem = Semaphore(1) // allow only a single MWA connection at a time
-
 
 
     init {
@@ -63,10 +64,12 @@ class HomeScreenViewModel(
             doAuthorize(client)
         }
 
-        if (result == true) {
-            println("LOGC: Authorized")
-        } else {
-            println("LOGC: FAILED")
+        result?.let {
+            if (it) {
+                println("LOGC: Authorized")
+            } else {
+                println("LOGC: FAILED")
+            }
         }
     }
 
@@ -81,7 +84,8 @@ class HomeScreenViewModel(
                 totalStorage = 0.0,
                 drives = drives,
                 recentItems = listOf(),
-                publicKey = ""
+                publicKey = "",
+                authorized = false
             )
         }
     }
@@ -96,9 +100,15 @@ class HomeScreenViewModel(
                 "Solana",
                 ProtocolContract.CLUSTER_MAINNET_BETA
             ).get()
-            Log.d(TAG, "Authorized: $result")
-            homeUiState.publicKey = solanaRepository.base58Encode(result.publicKey)
+            val pk = solanaRepository.base58Encode(result.publicKey)
 
+            this.homeUiState = this.homeUiState.copy(
+                usedStorage = 0.3,
+                totalStorage = 0.8,
+                publicKey = pk,
+                authorized = true)
+
+            Log.d(TAG, "Authorized: $homeUiState")
             authorized = true
         } catch (e: ExecutionException) {
             when (val cause = e.cause) {
