@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -45,6 +46,7 @@ import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
 fun HomeScreen(
     homeUiState: HomeUiState,
     onNavigateToDrive: (drivePublicKey: String) -> Unit,
+    onAuthorize: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val usedStorage = homeUiState.usedStorage
@@ -106,6 +108,10 @@ fun HomeScreen(
                             .padding(16.dp)
                     )
                     VerticalScrollingRecentFileItems(recentItems = recentItems)
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Button(onClick = onAuthorize) {
+                        Text(text = "Authorize")
+                    }
                 }
 
             }
@@ -165,7 +171,8 @@ fun HomeScreenPreview() {
                 ),
             )
         ),
-        onNavigateToDrive = {}
+        onNavigateToDrive = {},
+        onAuthorize = {}
         )
     }
 }
