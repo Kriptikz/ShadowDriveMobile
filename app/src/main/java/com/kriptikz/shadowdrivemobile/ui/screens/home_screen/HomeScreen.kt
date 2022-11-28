@@ -178,7 +178,6 @@ fun DriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
             .background(Color.White)
             .padding(8.dp)
             .clickable {
-                println("CLICKED: ${text}")
                 onClick(text)
             }
     ) {
