@@ -104,20 +104,29 @@ fun DrivePhotoCard(imageUrl: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun PhotosGridScreen(photoUrls: List<String>, modifier: Modifier = Modifier) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(150.dp),
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(4.dp)
-    ) {
-        items(photoUrls.size) { index ->
-            Column {
-                Text(
-                    fontSize = 12.sp,
-                    text = photoUrls[index].split("/")[4],
-                    modifier = Modifier.height(16.dp).padding(start = 10.dp)
-                )
-                DrivePhotoCard(photoUrls[index])
+    if (photoUrls.isNotEmpty()) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(150.dp),
+            modifier = modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(4.dp)
+        ) {
+            items(photoUrls.size) { index ->
+                Column {
+                    Text(
+                        fontSize = 12.sp,
+                        text = photoUrls[index].split("/")[4],
+                        modifier = Modifier.height(16.dp).padding(start = 10.dp)
+                    )
+                    DrivePhotoCard(photoUrls[index])
+                }
             }
+        }
+    } else {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier.fillMaxSize()
+        ) {
+            Text(text = "No Files")
         }
     }
 }
