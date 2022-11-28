@@ -1,5 +1,7 @@
 package com.kriptikz.shadowdrivemobile.ui
 
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -12,11 +14,14 @@ import com.kriptikz.shadowdrivemobile.ui.screens.drive_screen.DriveScreen
 import com.kriptikz.shadowdrivemobile.ui.screens.drive_screen.DriveScreenViewModel
 import com.kriptikz.shadowdrivemobile.ui.screens.home_screen.HomeScreen
 import com.kriptikz.shadowdrivemobile.ui.screens.home_screen.HomeScreenViewModel
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun ShadowDriveMobileApp(
     homeScreenViewModel: HomeScreenViewModel,
     driveScreenViewModel: DriveScreenViewModel,
+    intentSender: HomeScreenViewModel.StartActivityForResultSender,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -28,7 +33,11 @@ fun ShadowDriveMobileApp(
                 onNavigateToDrive = { drivePublicKey: String ->
                     navController.navigate("driveScreen/${drivePublicKey}")
                     driveScreenViewModel.getDriveFiles(drivePublicKey)
-                }
+                },
+                onAuthorize = {
+                    GlobalScope.launch {
+                        homeScreenViewModel.authorize(intentSender) }
+                    }
             )
         }
         composable(
