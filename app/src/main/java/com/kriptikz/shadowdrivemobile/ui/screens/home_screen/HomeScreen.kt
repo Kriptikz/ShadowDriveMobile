@@ -91,10 +91,14 @@ fun HomeScreen(
                             .padding(16.dp)
                     )
                     if (homeUiState.authorized) {
-                        VerticalScrollingDrives(
-                            drives = drives,
-                            onClick = onNavigateToDrive,
-                        )
+                        if (homeUiState.drives.isNotEmpty()) {
+                            VerticalScrollingDrives(
+                                drives = drives,
+                                onClick = onNavigateToDrive,
+                            )
+                        } else {
+                            Text(text = "No drives created")
+                        }
                     } else {
                         Spacer(modifier = Modifier.height(30.dp))
                         Button(
