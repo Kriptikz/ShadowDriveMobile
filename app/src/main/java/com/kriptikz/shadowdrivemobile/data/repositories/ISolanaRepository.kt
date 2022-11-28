@@ -3,6 +3,7 @@ package com.kriptikz.shadowdrivemobile.data.repositories
 import com.portto.solana.web3.Connection
 import com.portto.solana.web3.PublicKey
 import com.portto.solana.web3.util.Cluster
+import org.bitcoinj.core.Base58
 import org.bitcoinj.core.Utils
 import org.bouncycastle.util.encoders.Base64
 import org.near.borshj.BorshBuffer
@@ -39,6 +40,7 @@ class UserInfoAccount {
 interface ISolanaRepository {
     suspend fun getUserInfoAccountCounter(userPublicKey: String) : UInt
     suspend fun getAllStorageAccounts(userPublicKey: String): ArrayList<String>
+    fun base58Encode(byteArray: ByteArray): String
 }
 
 class SolanaRepository : ISolanaRepository {
@@ -81,5 +83,9 @@ class SolanaRepository : ISolanaRepository {
         }
 
         return storageAccounts
+    }
+
+    override fun base58Encode(byteArray: ByteArray): String {
+        return Base58.encode(byteArray)
     }
 }
