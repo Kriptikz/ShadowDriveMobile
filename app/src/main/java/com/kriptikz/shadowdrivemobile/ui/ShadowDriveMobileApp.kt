@@ -19,10 +19,6 @@ fun ShadowDriveMobileApp(
     driveScreenViewModel: DriveScreenViewModel,
     modifier: Modifier = Modifier
 ) {
-//    DriveScreen(
-//        driveUiState = driveScreenViewModel.driveUiState
-//    )
-
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "homeScreen") {
@@ -30,18 +26,14 @@ fun ShadowDriveMobileApp(
             HomeScreen(
                 homeUiState = homeScreenViewModel.homeUiState,
                 onNavigateToDrive = { drivePublicKey: String ->
-                    println("DRIVE PUBLIC KEY: ${drivePublicKey}")
                     navController.navigate("driveScreen/${drivePublicKey}")
+                    driveScreenViewModel.getDriveFiles(drivePublicKey)
                 }
             )
         }
         composable(
             route = "driveScreen/{drivePublicKey}",
-            arguments = listOf(navArgument("drivePublicKey") { defaultValue = "t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX" })
         ) {
-            val pk = it.arguments?.getString("drivePublicKey")
-            driveScreenViewModel.drivePk = pk!!
-            driveScreenViewModel.getDriveFiles()
             DriveScreen(
                 driveUiState = driveScreenViewModel.driveUiState,
             )

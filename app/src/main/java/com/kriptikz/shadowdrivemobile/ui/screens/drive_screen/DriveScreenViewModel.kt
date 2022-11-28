@@ -1,17 +1,17 @@
 package com.kriptikz.shadowdrivemobile.ui.screens.drive_screen
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.getInstance
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kriptikz.shadowdrivemobile.ShadowDriveMobileApplication
 import com.kriptikz.shadowdrivemobile.data.repositories.ShadowDriveRepository
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.IOException
 
 sealed interface DriveUiState {
@@ -29,16 +29,13 @@ class DriveScreenViewModel(
     var drivePk by mutableStateOf("t5Cp1F6VcoeXxqNC7TrmYCJofT9U7iEPbziY252tPnX")
 
     init {
-        getDriveFiles()
+        getDriveFiles(drivePk)
     }
 
-    fun getDriveFiles() {
+    fun getDriveFiles(publicKey: String) {
+        driveUiState = DriveUiState.Loading
         viewModelScope.launch {
             driveUiState = try {
-                val publicKey = drivePk
-//                val results = shadowDriveRepository.getDriveFileNames(publicKey).keys.filter { fileName ->
-//                    fileName.endsWith(".jpg")
-//                }
                 val results = shadowDriveRepository.getDriveFileNames(publicKey).keys
 
                 val baseUrl = "https://shdw-drive.genesysgo.net/"
