@@ -5,10 +5,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -81,6 +86,26 @@ fun ResultScreen(fileNames: List<String>, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun DriveIconCard(painter: Painter, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(4.dp)
+            .fillMaxSize(),
+        elevation = 8.dp,
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+        ){
+//            Icon(painter = painter, contentDescription = null,
+//            modifier = Modifier.aspectRatio(2.0f, true)),
+            Image(painter = painter, contentDescription = null,
+                alignment = Alignment.Center,
+            modifier = Modifier.aspectRatio(1.0f))
+        }
+    }
+}
+
+@Composable
 fun DrivePhotoCard(imageUrl: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
@@ -102,6 +127,34 @@ fun DrivePhotoCard(imageUrl: String, modifier: Modifier = Modifier) {
     }
 }
 
+fun isPhoto(url: String): Boolean {
+    val suffix = url.substringAfterLast('.')
+
+    println("SUFFIX: ${suffix}")
+    when (suffix) {
+        "jpg" -> {
+            return true
+        }
+        "png" -> {
+            return true
+        }
+    }
+    return false
+}
+
+fun isText(url: String): Boolean {
+    val suffix = url.substringAfterLast('.')
+
+    println("SUFFIX: ${suffix}")
+    when (suffix) {
+        "txt" -> {
+            return true
+        }
+    }
+    return false
+}
+
+
 @Composable
 fun PhotosGridScreen(photoUrls: List<String>, modifier: Modifier = Modifier) {
     if (photoUrls.isNotEmpty()) {
@@ -115,9 +168,18 @@ fun PhotosGridScreen(photoUrls: List<String>, modifier: Modifier = Modifier) {
                     Text(
                         fontSize = 12.sp,
                         text = photoUrls[index].split("/")[4],
-                        modifier = Modifier.height(16.dp).padding(start = 10.dp)
+                        modifier = Modifier
+                            .height(16.dp)
+                            .padding(start = 10.dp)
                     )
-                    DrivePhotoCard(photoUrls[index])
+                    if (isPhoto(photoUrls[index])) {
+                        DrivePhotoCard(photoUrls[index])
+                    } else if (isText(photoUrls[index])) {
+                        DriveIconCard(painterResource(id = R.drawable.ic_txt_file))
+                    }
+                    else {
+                        DriveIconCard(painterResource(id = R.drawable.ic_folder_drives))
+                    }
                 }
             }
         }
