@@ -67,23 +67,37 @@ class HomeScreenViewModel(
         result?.let {
             if (it) {
                 println("LOGC: Authorized")
+                getDrives(homeUiState.publicKey)
             } else {
                 println("LOGC: FAILED")
             }
         }
     }
 
+    private suspend fun getDrives(publicKey: String) {
+        try {
+            val drives = solanaRepository.getAllStorageAccounts(publicKey)
+
+            homeUiState = homeUiState.copy(
+                usedStorage = 0.3,
+                totalStorage = 0.8,
+                drives = drives
+            )
+        } catch(error: NullPointerException) {
+            println("Exception getting storage accounts")
+        }
+    }
+
     fun getDefaultState() {
         viewModelScope.launch {
 
-            val drives = solanaRepository.getAllStorageAccounts("6HE1JdihWH71nT18CPUCghahVLRqAGYkmBJWZAPE3ggU")
 
 
             homeUiState = HomeUiState(
                 usedStorage = 0.0,
                 totalStorage = 0.0,
-                drives = drives,
-                recentItems = listOf(),
+                drives = emptyList(),
+                recentItems = emptyList(),
                 publicKey = "",
                 authorized = false
             )
@@ -103,8 +117,8 @@ class HomeScreenViewModel(
             val pk = solanaRepository.base58Encode(result.publicKey)
 
             this.homeUiState = this.homeUiState.copy(
-                usedStorage = 0.3,
-                totalStorage = 0.8,
+                usedStorage = 0.0,
+                totalStorage = 0.0,
                 publicKey = pk,
                 authorized = true)
 
