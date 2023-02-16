@@ -51,20 +51,20 @@ fun SDMScaffold(title: String, modifier: Modifier = Modifier, content: @Composab
                 }
             }
         },
-        bottomBar = {
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .background(Color.Black)
-            ) {
-                Icon(Icons.Default.Menu, contentDescription = null, tint = Color.Gray)
-                Icon(Icons.Default.Home, contentDescription = null, tint = Color.Gray)
-                Icon(Icons.Default.AccountBox, contentDescription = null, tint = Color.Gray)
-            }
-        },
+//        bottomBar = {
+//            Row(
+//                horizontalArrangement = Arrangement.SpaceEvenly,
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(40.dp)
+//                    .background(Color.Black)
+//            ) {
+//                Icon(Icons.Default.Menu, contentDescription = null, tint = Color.Gray)
+//                Icon(Icons.Default.Home, contentDescription = null, tint = Color.Gray)
+//                Icon(Icons.Default.AccountBox, contentDescription = null, tint = Color.Gray)
+//            }
+//        },
     ) {
         // A surface container using the 'background' color from the theme
         Surface(

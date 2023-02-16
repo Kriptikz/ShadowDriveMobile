@@ -1,10 +1,13 @@
 package com.kriptikz.shadowdrivemobile.ui.screens.drive_screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -30,12 +34,13 @@ import com.kriptikz.shadowdrivemobile.R
 @Composable
 fun DriveScreen(
     driveUiState: DriveUiState,
+    onUploadClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     SDMScaffold(title = "Drive") {
         when (driveUiState) {
             is DriveUiState.Loading -> LoadingScreen(modifier)
-            is DriveUiState.Success -> PhotosGridScreen(photoUrls = driveUiState.fileNames, modifier = modifier)
+            is DriveUiState.Success -> PhotosGridScreen(photoUrls = driveUiState.fileNames, onUploadClicked = onUploadClicked, modifier = modifier)
             is DriveUiState.Error -> ErrorScreen(modifier)
         }
     }
@@ -69,7 +74,9 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
 @Composable
 fun DriveScreenPreview() {
     ShadowDriveMobileTheme {
-        DriveScreen(DriveUiState.Success(listOf("Some State")))
+        DriveScreen(DriveUiState.Success(listOf("Some State")),
+        onUploadClicked = {}
+        )
     }
 }
 
@@ -135,6 +142,9 @@ fun isPhoto(url: String): Boolean {
         "jpg" -> {
             return true
         }
+        "jpeg" -> {
+            return true
+        }
         "png" -> {
             return true
         }
@@ -156,32 +166,49 @@ fun isText(url: String): Boolean {
 
 
 @Composable
-fun PhotosGridScreen(photoUrls: List<String>, modifier: Modifier = Modifier) {
+fun PhotosGridScreen(photoUrls: List<String>, onUploadClicked: () -> Unit, modifier: Modifier = Modifier) {
     if (photoUrls.isNotEmpty()) {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(150.dp),
-            modifier = modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(4.dp, bottom = 50.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(photoUrls.size) { index ->
-                Column {
-                    Text(
-                        fontSize = 12.sp,
-                        text = photoUrls[index].split("/")[4],
-                        modifier = Modifier
-                            .height(16.dp)
-                            .padding(start = 10.dp)
-                    )
-                    if (isPhoto(photoUrls[index])) {
-                        DrivePhotoCard(photoUrls[index])
-                    } else if (isText(photoUrls[index])) {
-                        DriveIconCard(painterResource(id = R.drawable.ic_txt_file))
-                    }
-                    else {
-                        DriveIconCard(painterResource(id = R.drawable.ic_folder_drives))
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(150.dp),
+                modifier = modifier
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(4.dp, bottom = 50.dp)
+            ) {
+                items(photoUrls.size) { index ->
+                    Column {
+                        Text(
+                            fontSize = 12.sp,
+                            text = photoUrls[index].split("/")[4],
+                            modifier = Modifier
+                                .height(16.dp)
+                                .padding(start = 10.dp)
+                        )
+                        if (isPhoto(photoUrls[index])) {
+                            DrivePhotoCard(photoUrls[index])
+                        } else if (isText(photoUrls[index])) {
+                            DriveIconCard(painterResource(id = R.drawable.ic_txt_file))
+                        }
+                        else {
+                            DriveIconCard(painterResource(id = R.drawable.ic_folder_drives))
+                        }
                     }
                 }
             }
+            Box(
+               modifier = Modifier.fillMaxSize()
+            ) {
+                androidx.compose.material3.Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    onClick = onUploadClicked,
+                    modifier = Modifier.padding(end = 16.dp).align(Alignment.BottomEnd)
+                ) {
+                    Text(text = "Upload")
+                }
+            }
+
         }
     } else {
         Box(

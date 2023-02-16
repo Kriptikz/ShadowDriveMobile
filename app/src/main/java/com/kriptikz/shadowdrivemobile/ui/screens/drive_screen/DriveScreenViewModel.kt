@@ -30,6 +30,18 @@ class DriveScreenViewModel(
 
     init {
         getDriveFiles(drivePk)
+        getStorageAccountInfo(drivePk)
+    }
+
+    private fun getStorageAccountInfo(publicKey: String) {
+        viewModelScope.launch {
+            try {
+                val storageAccount = shadowDriveRepository.getStorageAccountInfo(publicKey)
+                println("LOGC: Storage Account Info ${storageAccount.identifier}")
+            } catch (e: IOException) {
+                println("LOGC: ERROR")
+            }
+        }
     }
 
     fun getDriveFiles(publicKey: String) {

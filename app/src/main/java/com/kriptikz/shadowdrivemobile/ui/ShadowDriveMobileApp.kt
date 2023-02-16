@@ -19,9 +19,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ShadowDriveMobileApp(
-    homeScreenViewModel: HomeScreenViewModel,
-    driveScreenViewModel: DriveScreenViewModel,
     intentSender: HomeScreenViewModel.StartActivityForResultSender,
+    homeScreenViewModel: HomeScreenViewModel = viewModel(factory = HomeScreenViewModel.Factory),
+    driveScreenViewModel: DriveScreenViewModel = viewModel(factory = DriveScreenViewModel.Factory),
+    onUploadClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -34,10 +35,14 @@ fun ShadowDriveMobileApp(
                     navController.navigate("driveScreen/${drivePublicKey}")
                     driveScreenViewModel.getDriveFiles(drivePublicKey)
                 },
+                onDisconnect = {
+                    homeScreenViewModel.disconnect()
+               },
                 onAuthorize = {
                     GlobalScope.launch {
                         homeScreenViewModel.authorize(intentSender) }
-                    }
+                    },
+                onUpload = onUploadClicked
             )
         }
         composable(
@@ -45,6 +50,7 @@ fun ShadowDriveMobileApp(
         ) {
             DriveScreen(
                 driveUiState = driveScreenViewModel.driveUiState,
+                onUploadClicked = onUploadClicked,
             )
         }
     }

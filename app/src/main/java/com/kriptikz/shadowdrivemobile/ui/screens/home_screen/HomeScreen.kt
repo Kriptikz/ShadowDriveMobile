@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonColors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kriptikz.shadowdrivemobile.R
+import com.kriptikz.shadowdrivemobile.data.entities.StorageAccount
 import com.kriptikz.shadowdrivemobile.ui.screens.SDMScaffold
 import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
 
@@ -45,13 +45,17 @@ import com.kriptikz.shadowdrivemobile.ui.theme.ShadowDriveMobileTheme
 fun HomeScreen(
     homeUiState: HomeUiState,
     onNavigateToDrive: (drivePublicKey: String) -> Unit,
+    onDisconnect: () -> Unit,
+    onUpload: () -> Unit,
     onAuthorize: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val usedStorage = homeUiState.usedStorage
     val totalStorage = homeUiState.totalStorage
     val drives = homeUiState.drives
-    val recentItems = homeUiState.recentItems
+    val wallet = homeUiState.wallet
+    val sol = homeUiState.sol
+    val shdw = homeUiState.shdw
 
     SDMScaffold(title = "Home") {
         val scrollableState = ScrollState(0)
@@ -64,7 +68,9 @@ fun HomeScreen(
                 )
         ) {
             Box(
-                modifier = Modifier.fillMaxHeight().background(Color.White)
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .background(Color.White)
             ) {
                 Box(
                     modifier = Modifier
@@ -78,7 +84,25 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "${String.format("%.4f", sol).toDouble()} SOL", color = Color.White)
+                        Text(text = "${String.format("%.4f", shdw).toDouble()} SHDW", color = Color.White)
+                    }
                     AvailableStorage(usedStorage, totalStorage)
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp)
+                    ) {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                            onClick = onDisconnect
+                        ) {
+                            Text(text = "Disconnect")
+                        }
+                    }
                     Text(
                         text = "Drives",
                         style = TextStyle(
@@ -90,8 +114,8 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
-                    if (homeUiState.authorized) {
-                        if (homeUiState.drives.isNotEmpty()) {
+                    if (homeUiState.wallet?.authToken != null) {
+                        if (drives.isNotEmpty()) {
                             VerticalScrollingDrives(
                                 drives = drives,
                                 onClick = onNavigateToDrive,
@@ -128,7 +152,7 @@ fun HomeScreenPreview() {
         HomeScreen(HomeUiState(
             usedStorage = 14.5,
             totalStorage = 40.0,
-            drives = listOf("Photos", "Videos", "Pictures", "Temporary", "AnotherOne", "Ok"),
+            drives = listOf(),
             recentItems = listOf(
                 RecentItem(
                     name = "file.txt",
@@ -171,11 +195,14 @@ fun HomeScreenPreview() {
                     size = "420.0GB",
                 ),
             ),
-            publicKey = "",
-            authorized = false,
+            wallet = null,
+            sol = 0.0,
+            shdw = 0.0,
         ),
-        onNavigateToDrive = {},
-        onAuthorize = {}
+            onNavigateToDrive = {},
+            onDisconnect = {},
+            onAuthorize = {},
+            onUpload = {}
         )
     }
 }
@@ -192,19 +219,21 @@ fun HorizontalDriveClickable(text: String, onClick: (drivePublicKey: String) -> 
             }
     ) {
         val formattedDrives =
-                text.substring(
-                    range = IntRange(
-                        start = 0,
-                        endInclusive = 5
-                    )
-                ) + "..." + text.substring(
-                    range = IntRange(
-                        start = text.length - 4,
-                        endInclusive = text.length - 1
-                    )
+            text.substring(
+                range = IntRange(
+                    start = 0,
+                    endInclusive = 5
                 )
-        Icon(painter = painterResource(
-            id = R.drawable.ic_folder_drives),
+            ) + "..." + text.substring(
+                range = IntRange(
+                    start = text.length - 4,
+                    endInclusive = text.length - 1
+                )
+            )
+        Icon(
+            painter = painterResource(
+                id = R.drawable.ic_folder_drives
+            ),
             contentDescription = null,
             tint = Color.LightGray,
         )
@@ -216,7 +245,10 @@ fun HorizontalDriveClickable(text: String, onClick: (drivePublicKey: String) -> 
 }
 
 @Composable
-fun VerticalDriveClickable(text: String, onClick: (drivePublicKey: String) -> Unit) {
+fun VerticalDriveClickable(
+    storageAccount: StorageAccount,
+    onClick: (drivePublicKey: String) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -224,20 +256,34 @@ fun VerticalDriveClickable(text: String, onClick: (drivePublicKey: String) -> Un
             .padding(8.dp)
             .padding(start = 8.dp)
             .clickable {
-                onClick(text)
+                onClick(storageAccount.address)
             }
     ) {
-        Icon(painter = painterResource(
-            id = R.drawable.ic_folder_drives),
-            contentDescription = null,
-            tint = Color.LightGray,
-        )
-        Text(
-            text = text,
-            modifier = Modifier
-                .padding(8.dp)
-                .padding(start = 8.dp)
-        )
+        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_folder_drives),
+                contentDescription = null,
+                tint = Color.LightGray,
+            )
+        }
+        Column {
+            Text(
+                text = storageAccount.identifier,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .padding(start = 8.dp)
+            )
+            Text(
+                fontSize = 8.sp,
+                text = storageAccount.address,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .padding(start = 8.dp)
+            )
+        }
     }
 }
 
@@ -250,7 +296,11 @@ fun MyDrivesPreview() {
 }
 
 @Composable
-fun HorizontalScrollingDrives(drives: List<String>, onClick: (drivePublicKey: String) -> Unit, modifier: Modifier = Modifier) {
+fun HorizontalScrollingDrives(
+    drives: List<String>,
+    onClick: (drivePublicKey: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyRow(
         content = {
             items(drives) { drive ->
@@ -273,19 +323,23 @@ fun HorizontalScrollingDrivesPreview() {
 }
 
 @Composable
-fun VerticalScrollingDrives(drives: List<String>, onClick: (drivePublicKey: String) -> Unit, modifier: Modifier = Modifier) {
+fun VerticalScrollingDrives(
+    drives: List<StorageAccount>,
+    onClick: (drivePublicKey: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = 50.dp),
         content = {
             items(drives) { drive ->
                 VerticalDriveClickable(
-                    text = drive,
+                    storageAccount = drive,
                     onClick = onClick
                 )
 
             }
         },
-        modifier = modifier.fillMaxHeight()
+        modifier = modifier.fillMaxSize()
     )
 }
 
@@ -312,16 +366,58 @@ fun AvailableStorage(usedStorage: Double, totalStorage: Double, modifier: Modifi
                 style = TextStyle(Color.LightGray),
                 modifier = Modifier.height(30.dp)
             )
+            val used = usedStorage.let {
+                var newUsed = it
+                var timesDivided = 0
+                while(newUsed > 1024) {
+                    newUsed = newUsed.div(1024.0)
+                    timesDivided += 1
+                }
+
+                val bytesDenotation = when(timesDivided) {
+                    0 -> "B"
+                    1 -> "KB"
+                    2 -> "MB"
+                    3 -> "GB"
+                    4 -> "TB"
+                    else -> "?B"
+                }
+
+                String.format("%.2f", newUsed) + bytesDenotation
+            }
+            val total = totalStorage.let {
+                var newUsed = it
+                var timesDivided = 0
+                while(newUsed > 1024) {
+                    newUsed = newUsed.div(1024.0)
+                    timesDivided += 1
+                }
+
+                val bytesDenotation = when(timesDivided) {
+                    0 -> "B"
+                    1 -> "KB"
+                    2 -> "MB"
+                    3 -> "GB"
+                    4 -> "TB"
+                    else -> "?B"
+                }
+
+                String.format("%.2f", newUsed) + bytesDenotation
+            }
             Text(
-                text = "${usedStorage}GB of ${totalStorage}GB used",
+                text = "$used of $total used",
                 style = TextStyle(Color.White),
                 modifier = Modifier.height(30.dp)
             )
         }
         Box(
             contentAlignment = Alignment.Center,
-        ){
-            CircularProgressBar(percentage = (if (totalStorage == 0.0) 0.0 else  usedStorage / totalStorage).toFloat(), number = 100, startPercentage = 0.0f)
+        ) {
+            CircularProgressBar(
+                percentage = (if (totalStorage == 0.0) 0.0 else usedStorage / totalStorage).toFloat(),
+                number = 100,
+                startPercentage = 0.0f
+            )
         }
     }
 }
@@ -343,13 +439,13 @@ fun CircularProgressBar(
     strokeWidth: Dp = 6.dp,
     animDuration: Int = 1000,
     animDelay: Int = 0
-    ) {
+) {
     var animationPlayed by remember {
         mutableStateOf(false)
     }
 
     val curPercentage = animateFloatAsState(
-        targetValue = if(animationPlayed) percentage else startPercentage,
+        targetValue = if (animationPlayed) percentage else startPercentage,
         animationSpec = tween(
             durationMillis = animDuration,
             delayMillis = animDelay
@@ -494,5 +590,8 @@ fun VerticalScrollingRecentFileItemPreview() {
             size = "10.0MB",
         ),
     )
-    VerticalScrollingRecentFileItems(recentItems = recentItems, modifier = Modifier.background(Color.White))
+    VerticalScrollingRecentFileItems(
+        recentItems = recentItems,
+        modifier = Modifier.background(Color.White)
+    )
 }
